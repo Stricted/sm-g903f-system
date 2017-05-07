@@ -130,8 +130,8 @@
 /system/app/KnoxAttestationAgent/KnoxAttestationAgent.apk
 /system/app/BluetoothMidiService/BluetoothMidiService.apk
 /system/app/SplitSoundService/SplitSoundService.apk
-/system/app/EdmSimPinService/EdmSimPinService.apk
 /system/app/PartnerBookmarksProvider/PartnerBookmarksProvider.apk
+/system/app/EdmSimPinService/EdmSimPinService.apk
 /system/app/EdmVpnServices/EdmVpnServices.apk
 /system/app/PacProcessor/PacProcessor.apk
 /system/app/ImsTelephonyService/ImsTelephonyService.apk
@@ -226,6 +226,7 @@
 /system/priv-app/ContextProvider/ContextProvider.apk
 /system/priv-app/AutoPreconfig/AutoPreconfig.apk
 /system/priv-app/DiagMonAgent/DiagMonAgent.apk
+/system/priv-app/TzDataUpdater_M/TzDataUpdater_M.apk
 /system/priv-app/InputDevices/InputDevices.apk
 /system/priv-app/MsgCommService/MsgCommService.apk
 /system/priv-app/SamsungMagnifier2/SamsungMagnifier2.apk
