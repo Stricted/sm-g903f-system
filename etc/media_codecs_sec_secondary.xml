@@ -15,6 +15,12 @@
 -->
 
 <MediaCodecs>
+    <Decoders>
+        <MediaCodec name="OMX.SEC.aac.dec" type="audio/mp4a-latm" >
+            <Quirk name="needs-flush-before-disable" />
+            <Quirk name="decoder-ignores-streamcorrupt-error" />
+        </MediaCodec>
+    </Decoders>
     <Encoders>
         <MediaCodec name="OMX.SEC.naac.enc" type="audio/mp4a-latm">
             <Limit name="channel-count" max="6" />

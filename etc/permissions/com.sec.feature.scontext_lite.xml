@@ -16,5 +16,5 @@
 
 <!-- Feature for devices with a context awareness. -->
 <permissions>
-    <feature name="com.sec.feature.scontext_lite" />
+    <feature name="com.sec.feature.scontext_lite" version="1"/>
 </permissions>

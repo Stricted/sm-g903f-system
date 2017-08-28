@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes'?>
+<preferred-activities>
+    <item name="com.sec.android.app.music/com.samsung.android.app.music.common.activity.SoundPlayerActivity">
+        <filter>
+            <action name="android.intent.action.VIEW" />
+            <type name="audio/mpeg" />
+            <cat name="android.intent.category.DEFAULT" />
+            <scheme name="file"/>
+        </filter>
+    </item>
+    <item name="com.sec.android.app.music/com.sec.android.app.music.common.activity.MusicMainActivity">
+        <filter>
+            <action name="android.intent.action.MAIN" />
+            <cat name="android.intent.category.APP_MUSIC" />
+            <cat name="android.intent.category.DEFAULT" />
+        </filter>
+    </item>
+</preferred-activities>

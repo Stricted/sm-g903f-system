@@ -1,0 +1,10 @@
+#[ADD_FOR_SAMSUNG : powersound
+on boot
+service powersnd /system/bin/samsungpowersoundplay
+    class main
+    user audioserver
+    group system
+    disabled
+    oneshot
+#ADD_FOR_SAMSUNG]
+

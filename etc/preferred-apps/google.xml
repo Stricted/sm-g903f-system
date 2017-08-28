@@ -51,7 +51,7 @@
             <type name="image/vnd.wap.wbmp" />
         </filter>
     </item>
-    <item name="com.google.android.apps.plus/.phone.ConversationListActivity">
+    <item name="com.google.android.apps.photos/.home.HomeActivity">
         <filter>
             <action name="android.intent.action.MAIN" />
             <cat name="android.intent.category.APP_GALLERY" />
@@ -98,4 +98,29 @@
 
       </filter>
     </item>
+    <item name="com.google.android.googlequicksearchbox/com.google.android.search.core.google.GoogleSearch">
+      <filter>
+            <action name="android.intent.action.WEB_SEARCH" />
+            <cat name="android.intent.category.DEFAULT" />
+      </filter>
+    </item>
+    <item name="com.google.android.googlequicksearchbox/.SearchActivity">
+      <filter>
+            <action name="android.intent.action.ASSIST" />
+            <cat name="android.intent.category.DEFAULT" />
+      </filter>
+    </item>
+    <manual-item name="com.google.android.music/com.google.android.music.ui.playback.AudioPreviewActivity">
+        <intent>
+            <action name="android.intent.action.VIEW" />
+            <cat name="android.intent.category.DEFAULT" />
+            <type name="audio/mpeg" />
+            <uri name="file:///foo.mp3"/>
+        </intent>
+        <filter>
+            <action name="android.intent.action.VIEW" />
+            <cat name="android.intent.category.DEFAULT" />
+            <type name="audio/mpeg" />
+        </filter>
+    </manual-item>
 </preferred-activities>

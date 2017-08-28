@@ -29,10 +29,6 @@
             <Quirk name="needs-flush-before-disable" />
             <Quirk name="decoder-ignores-streamcorrupt-error" />
         </MediaCodec>
-        <MediaCodec name="OMX.SEC.aac.dec" type="audio/mp4a-latm" >
-            <Quirk name="needs-flush-before-disable" />
-            <Quirk name="decoder-ignores-streamcorrupt-error" />
-        </MediaCodec>
         <MediaCodec name="OMX.SEC.flac.dec" type="audio/flac" >
             <Quirk name="needs-flush-before-disable" />
             <Quirk name="decoder-ignores-streamcorrupt-error" />

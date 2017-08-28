@@ -37,13 +37,11 @@
             <Limit name="bitrate" range="8000-960000" />
         </MediaCodec>
         <MediaCodec name="OMX.google.g711.alaw.decoder" type="audio/g711-alaw">
-            <Quirk name="decoder-lies-about-samplingrate" />
             <Limit name="channel-count" max="1" />
             <Limit name="sample-rate" ranges="8000-48000" />
             <Limit name="bitrate" range="64000" />
         </MediaCodec>
         <MediaCodec name="OMX.google.g711.mlaw.decoder" type="audio/g711-mlaw">
-            <Quirk name="decoder-lies-about-samplingrate" />
             <Limit name="channel-count" max="1" />
             <Limit name="sample-rate" ranges="8000-48000" />
             <Limit name="bitrate" range="64000" />

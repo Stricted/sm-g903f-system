@@ -24,8 +24,8 @@ spnOverride attributes:
 	spn: spn to show instead of EFSPN. locales can be specified here too, if needed
 	spn_display_rule: SPN_RULE_SHOW_SPN, SPN_RULE_SHOW_PLMN or both
 	fake_home_on: regard specified PLMN as home
-    fake_roaming_on: regard specified PLMN as roaming (comma-separated list)
-
+        fake_roaming_on: regard specified PLMN as roaming (comma-separated list)
+        vowifi_opname: regard specified PLMN as vowifi
 examples:
 	<spnOverride
 		numeric="45001" spn="ko_KR;?�국??SPN,en;English SPN,fr;Français SPN,pl;Polski SPN,Default SPN"
@@ -63,6 +63,12 @@ examples:
 <!-- Finland -->
     <spnOverride numeric="24421" fake_home_on="24405"/>
 
+<!-- India -->
+    <spnOverride numeric="40417" spn_display_rule="SPN_RULE_SHOW_SPN" spn_override_only_on="40417"/>
+
+<!-- Samsung Test Bed -->
+    <spnOverride numeric="45001" vowifi_opname="Samsung-VoWifi"/>
+
 <!-- Japan -->
     <spnOverride numeric="44010" spn="NTT DOCOMO"/>
     <spnOverride numeric="44050" fake_home_on="44050,44051,44007,44008,44052,44053,44054,44055,44056,44070,44071,44072,44073,44074,44075,44076,44077,44078,44079,44088,44089,44170,00101"/>
@@ -86,7 +92,7 @@ examples:
     <spnOverride numeric="44079" fake_home_on="44050,44051,44007,44008,44052,44053,44054,44055,44056,44070,44071,44072,44073,44074,44075,44076,44077,44078,44079,44088,44089,44170,00101"/>
     <spnOverride numeric="44088" fake_home_on="44050,44051,44007,44008,44052,44053,44054,44055,44056,44070,44071,44072,44073,44074,44075,44076,44077,44078,44079,44088,44089,44170,00101"/>
     <spnOverride numeric="44089" fake_home_on="44050,44051,44007,44008,44052,44053,44054,44055,44056,44070,44071,44072,44073,44074,44075,44076,44077,44078,44079,44088,44089,44170,00101"/>
-    <spnOverride numeric="44170" fake_home_on="44050,44051,44007,44008,44052,44053,44054,44055,44056,44070,44071,44072,44073,44074,44075,44076,44077,44078,44079,44088,44089,44170,00101"/> 
+    <spnOverride numeric="44170" fake_home_on="44050,44051,44007,44008,44052,44053,44054,44055,44056,44070,44071,44072,44073,44074,44075,44076,44077,44078,44079,44088,44089,44170,00101"/>
 
 <!-- Italy -->
     <spnOverride numeric="22234" fake_home_on="22201"/> <!-- BT Italia @ I TIM-->
@@ -157,15 +163,28 @@ examples:
 
     <spnOverride numeric="338050" fake_home_on="33805,338050"/>
     <spnOverride numeric="33805" fake_home_on="33805,338050"/>
+    <spnOverride numeric="73003" spn_display_rule="SPN_RULE_SHOW_SPN" spn_override_only_on="73001,73002,73003,73007,73008,73009,73010" fake_home_on="73001,73002,73003,73007,73008,73009,73010" spn="Claro"/>
     <spnOverride numeric="73007" fake_home_on="73002"/>
     <spnOverride numeric="73008" fake_home_on="73002"/>
-    <spnOverride numeric="73009" fake_home_on="73001,73003,73010"/>
+    <spnOverride numeric="73009" fake_home_on="73001,73002,73003,73010"/>
+
+<!-- FLOW -->
+    <spnOverride numeric="365840" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="344920" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="342600" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="348170" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="346140" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="366110" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="352110" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="338180" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="354860" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="356110" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="358110" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="360110" fake_sim_spn="FLOW"/>
+    <spnOverride numeric="376350" fake_sim_spn="FLOW"/>
 
 <!-- SEAU Austrailia -->
     <spnOverride numeric="50502" imsi_subset="9" spn_display_rule="SPN_RULE_SHOW_SPN" spn_override_only_on="50502"/>
-
-<!-- SENZ New Zealand -->
-    <spnOverride numeric="53005" spn_display_rule="SPN_RULE_SHOW_PLMN" spn_override_only_on="53005"/>
 
 <!-- SENZ New Zealand SKINNY -->
     <spnOverride numeric="53005" imsi_subset="204" spn_display_rule="SPN_RULE_SHOW_SPN" spn_override_only_on="53005"/>
@@ -194,7 +213,7 @@ examples:
     <spnOverride numeric="23212" spn_display_rule="SPN_RULE_SHOW_PLMN" spn_override_only_on="23201" fake_home_on="23201"/> <!-- yesss! and Ge org! @ A1 network -->
     <spnOverride numeric="23207" spn_display_rule="SPN_RULE_SHOW_PLMN" fake_home_on="23203,23205,23210"/> <!-- tele.ring and HoT @ T-Mobile A -->
     <spnOverride numeric="23203" fake_home_on="23205,23210"/>  <!-- H3G Network -->
-    <spnOverride numeric="23210" fake_home_on="23203,23205"/>  <!-- H3G Network -->
+    <spnOverride numeric="23210" spn_display_rule="SPN_RULE_SHOW_SPN" spn_override_only_on="23205,23210" fake_home_on="23203,23205"/>  <!-- H3G Network -->
     <spnOverride numeric="23205" fake_home_on="23203,23210"/>  <!-- H3G Network -->
     <spnOverride numeric="23213" fake_home_on="23203,23205,23210"/> <!-- UPC Network -->
     <spnOverride numeric="23217" fake_home_on="23203,23205,23210"/> <!-- spusu Network -->
@@ -273,7 +292,7 @@ examples:
 
 <!-- Singapore -->
     <spnOverride numeric="52503" spn_display_rule="SPN_RULE_SHOW_PLMN" spn_override_only_on="52503"/>
-	
+
 <!-- Qatar -->
     <spnOverride numeric="42701"  spn="Ooredoo"/>
 
@@ -284,15 +303,12 @@ examples:
 <!-- Kenya -->
 	<spnOverride numeric="63905" spn_display_rule="SPN_RULE_SHOW_SPN" spn="YU"/>
 
-<!-- Tajikistan --> 
+<!-- Tajikistan -->
 	<spnOverride numeric="43601" fake_home_on="43602"/> <!-- North Tcell @ South Tcell network -->
 	<spnOverride numeric="43602" fake_home_on="43601"/> <!-- South Tcell @ North Tcell network -->
 
 <!-- Kuwait -->
     <spnOverride numeric="41903" spn_display_rule="SPN_RULE_SHOW_SPN" spn="Ooredoo"/>
-
-<!-- New Zealand  -->
-    <spnOverride numeric="53005" spn_display_rule="SPN_RULE_SHOW_PLMN" spn_override_only_on="53005"/>  <!-- Spark NZ -->
 
 <!-- South Africa -->
     <spnOverride numeric="65507" imsi_subset="10" spn_display_rule="SPN_RULE_SHOW_SPN" spn="Virgin" spn_override_only_on="655"/> <!-- Virgin is roaming on 'Cell C' network (same mcc-mnc) and this display rule for home country  -->

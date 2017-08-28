@@ -17,291 +17,541 @@
 # 3. count(source) * count(target) * count(class) * count(perm) MUST BE LESS THAN THRESHOLD(100000)
 #
 
+########### TG issue : Remove it after Fix ###########
 ########### appdomain ###########
+### system_app ###
+# N_P160907-05477 : smart manager
+# avc:  denied  { execute } for  pid=10169 comm="sung.android.sm" path="/data/data/com.samsung.android.sm/files/lib/liblzma.so" dev="sda18" ino=590976 scontext=u:r:system_app:s0 tcontext=u:object_r:system_app_data_file:s0 tclass=file permissive=0
+auditfilter system_app system_app_data_file:file execute; comm="sung.android.sm"
 
-### bluetooth ###
-# auditfilter bluetooth app_data_file:dir search; dontaudit due to downloaded app(aillis)
-# auditfilter bluetooth platform_app:dir search; dev="proc" request dontaudit from insick.jung
-# auditfilter bluetooth untrusted_app:dir search; dev="proc" request dontaudit from insick.jung
+# P160913-03874 : smart manager
+# avc:  denied  { write } for  pid=9604 comm="oid.sm.provider" name="misc" dev="sda22" ino=131073 scontext=u:r:system_app:s0 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0
+auditfilter system_app system_data_file:dir write; comm="oid.sm.provider" name="misc"
 
-### dnsmasq ###
-# P160610-02828 / suddenly notice / Grace EUR OPEN(N930FXXU0APF9)/ SEPF_SECMOBILE_6.0.1_0013 
-auditfilter dnsmasq untrusted_app:fd use;
+# P160926-03387 : com.android.system
+# avc:  denied  { write } for  pid=11437 comm="RenderThread" name="data" dev="dm-1" ino=262145 scontext=u:r:system_app:s0 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0
+auditfilter system_app system_data_file:dir write; comm="RenderThread" name="data"
 
+# P160929-02477 : com.wssyncmldm
+# NRfaccessat avc:  denied  { write } for  pid=22235 comm="Thread-2" name="/" dev="sda18" ino=2 scontext=u:r:system_app:s0 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0
+auditfilter system_app system_data_file:dir write; name="/"
 
-### init ###
-auditfilter init proc:dir write;
+# log from SEA_site_N_OS@72
+# com.sec.android.app.sysscope
+# this direct access is not allowed by MLS restriction.
+# avc:  denied  { getattr } for  pid=8178 comm="pool-2-thread-1" path="/proc/4024" dev="proc" ino=19174 scontext=u:r:system_app:s0 tcontext=u:r:platform_app:s0:c512,c768 tclass=dir permissive=1
+# avc:  denied  { search } for  pid=8178 comm="pool-2-thread-1" name="4024" dev="proc" ino=19174 scontext=u:r:system_app:s0 tcontext=u:r:platform_app:s0:c512,c768 tclass=dir permissive=1
+# avc:  denied  { read } for  pid=8178 comm="pool-2-thread-1" name="statm" dev="proc" ino=38250 scontext=u:r:system_app:s0 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=file permissive=1
+# avc:  denied  { getattr } for  pid=8178 comm="pool-2-thread-1" path="/proc/4472/statm" dev="proc" ino=38250 scontext=u:r:system_app:s0 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=file permissive=1
+auditfilter system_app { platform_app priv_app untrusted_app sec_untrusted_app trustonicpartner_app }:dir { search getattr };
 
-### init ###
-# P160528-00377 / User Trial, proc binder case / SEPF_SECMOBILE_6.0.1_0013
-# P160610-00508 / add onemore case: untrusted_app / SM-N930V_NA_VZW(graceqltevzw) / SEPF_SECMOBILE_6.0.1_0013
-# P160701-00261 / add onemore case: sec_untrusted_app / Grace MR / SEPF_SECMOBILE_6.0.1_0013
-auditfilter nfc { platform_app sec_untrusted_app untrusted_app }:dir search; dev="proc"
+# seandroid/board/N_review_request/view/21686514/
+# avc:  denied  { call } for  pid=24774 comm="dumpsys" scontext=u:r:system_app:s0 tcontext=u:r:fingerprintd:s0 tclass=binder permissive=0 SEPF_SECMOBILE_7.0_0004
+# avc:  denied  { use } for  pid=5744 comm="dumpsys" path="pipe:[371717]" dev="pipefs" ino=371717 scontext=u:r:fingerprintd:s0 tcontext=u:r:system_app:s0 tclass=fd
+auditfilter system_app fingerprintd:binder call;
+auditfilter fingerprintd system_app:fd use;
 
-
-### isolated_app ###
-# P160706-00613 com.android.chrome:sandboxed_process0
-# avc:  denied  { open } for  pid=22507 comm="CrRendererMain" name=".com.google.Chrome.sax2Zn" dev="dm-1" ino=336708 scontext=u:r:isolated_app:s0:c512,c768
-# tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0
-# neverallow rule : Isolated apps should not directly open app data files themselves.
-auditfilter isolated_app app_data_file:file open;
-
+# P170315-03872
+# avc:  denied  { search } for  pid=17257 comm=4173796E635461736B20233133 name="com.aasa.askschecker" dev="dm-1" ino=326561 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:system_app_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.0_DD02 unfiltered
+# avc:  denied  { read } for  pid=19565 comm="lient_spdupdate" name="ASKSB.xml" dev="dm-1" ino=326423 scontext=u:r:system_app:s0 tcontext=u:object_r:aasa_data_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_DD02 unfiltered
+auditfilter system_app aasa_data_file:file read;
+auditfilter priv_app system_app_data_file:dir search; name="com.aasa.askschecker"
 
 ### platform_app ###
-auditfilter platform_app app_data_file:dir search;
-auditfilter platform_app property_socket:sock_file write;
-auditfilter platform_app sec_untrusted_app:dir search;
-# P160119-03940 meida app and systemui had binder transaction, transfer FD
-auditfilter platform_app container_app_data_backend:file read;
-# P160119-02401 android.spay accesses other user proc
-auditfilter platform_app { platform_app sec_untrusted_app system_app untrusted_app }:dir search; comm="ng.android.spay"
-# P160601-05715 com.rsupport.mobizen.sec(Mobizen for SAMSUNG) SEPF_SECMOBILE_6.0.1_0013
-auditfilter platform_app { filtered_untrusted_app platform_app sec_untrusted_app system_app untrusted_app }:dir { getattr search }; comm="ps"
-# P160225-02687  AFW BYOD
-auditfilter sysaccess_platform_app aasa_app_data_file:dir search;
-
-### shell ###
-# P160108-01188 gotrace "atrace"
-# P160202-00243 adb shell dumpsys
-auditfilter shell { fingerprintd otp_server dmb }:binder call;
-auditfilter shell gatekeeper_service:service_manager find;
-
-### system_app ###
-auditfilter system_app app_data_file:dir search; comm="sung.android.sm"
-# P160528-00674 / system/bin/wvkprov/veriwvkey ppcomm=sec.keyverifier / SEPF_SECMOBILE_6.0.1_0011
-auditfilter system_app apk_data_file:dir write; comm="wvkprov"
-
-# P160414-00897 / sysscope app unique case Multi-user case
-auditfilter system_app system_app_data_file:ifile getattr; comm="id.app.sysscope"
-
-# auditfilter system_app wifi_data_file:dir { search write }; name="wifi" fixed CL6788905, 6808930
-auditfilter system_app { platform_app sec_untrusted_app untrusted_app}:process getattr;
+# log from P160921-01434
+# avc:  denied  { execute } for  pid=5538 comm="ktailbarservice" path="/data/data/com.samsung.android.app.cocktailbarservice/cache/Generated1725786881.dex" dev="sda22" ino=66007 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0
+# seandroid/board/N_review_request/view/22026056
+# avc:  denied  { execute } for  pid=14739 comm="xiaoyuan-ipool1" path="/data/data/com.samsung.android.app.sreminder/app_outdex/OnlineUpdateCycleConfig_69.dex" dev="dm-0" ino=524961 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0
+# avc:  denied  { execute } for  pid=14678 comm="Thread-10" path="/data/data/com.samsung.android.app.sreminder/app_outdex/parseUtilMain_81.dex" dev="dm-0" ino=524951 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0
+auditfilter platform_app app_data_file:file execute;
 
 
 ### untrusted_app ###
-auditfilter filtered_untrusted_app { app_data_file bluetooth_data_file nfc_data_file policyloader_app_data_file location_app_data_file }:dir search;
-auditfilter sec_untrusted_app { app_data_file bluetooth_data_file nfc_data_file policyloader_app_data_file location_app_data_file }:dir search;
-# P160528-00372 / com.spotify.music container_app_data_backend dir search / SEPF_SECMOBILE_6.0.1_0013
-# P160707-00334 / com.lookout|U0 sys_fstatat64 access to /data/user/150
-auditfilter untrusted_app { aasa_app_data_file app_data_file bluetooth_data_file container_app_data_backend nfc_data_file policyloader_app_data_file location_app_data_file }:dir { search getattr };
-auditfilter untrusted_app qsee_svc_app_data_file:dir search;
-auditfilter untrusted_app app_data_file:file link;
-auditfilter untrusted_app { app_efs_file efs_file sec_efs_file}:dir search;
-auditfilter untrusted_app full_device:chr_file { read write };
-auditfilter untrusted_app graphics_device:chr_file read;
-auditfilter untrusted_app hidden_file:file read;
-auditfilter untrusted_app kernel:lnk_file read;
-# P160528-00696 / dmesg command of com.nhnent.payapp(market app) / SEPF_SECMOBILE_6.0.1_0013
-auditfilter untrusted_app kernel:system syslog_read;
-auditfilter untrusted_app labeledfs:filesystem remount;
-auditfilter untrusted_app self:unix_stream_socket connectto;
-# System S/W does not want to open panel's info(sysfs_lcd_writable) / P160523-02269 / SEPF_SECMOBILE_6.0.1_0011
-auditfilter untrusted_app { sysfs_lowmemorykiller sysfs_lcd_writable }:file read;
+# P160927-04739 com.facebook.katana
+# avc:  denied  { read } for  pid=1466 comm="facebook.katana" name="1466-0" dev="debugfs" ino=506785 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:debugfs:s0 tclass=file permissive=0
+auditfilter untrusted_app debugfs:file read;
 
-# P160324-01374 / chmod777/data/local/tmp / com.wandoujia.eyepetizer
-auditfilter untrusted_app shell_data_file:dir setattr;
+# P161122-01529  com.drweb:monitor
+#avc:  denied  { setattr } for  pid=14122 comm="m.drweb:monitor" name="libDRWScanPSLib.so" dev="dm-1" ino=131994 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:apk_data_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0002
+auditfilter untrusted_app apk_data_file:file setattr;
 
-auditfilter untrusted_app system_app_data_file:lnk_file read;
-auditfilter untrusted_app untrusted_app:netlink_kobject_uevent_socket create;
+# P170529-01321 - net.pulsesecure.pulsesecure:remote
+# type=1400 audit(1496643125.377:2007): avc:  denied  { setattr } for  pid=26557 comm="sesecure:remote" name="user" dev="dm-0" ino=1109762 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app system_data_file:lnk_file setattr; comm="sesecure:remote"
+# P170620-04574 proctitle="net.pulsesecure.pulsesecure:remote"
+# avc:  denied  { setattr } for  pid=17498 comm="sesecure:remote" name="user" dev="dm-0" ino=1179650 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app system_data_file:dir setattr; comm="sesecure:remote"
+
+########### non-appdomain ###########
+### adsprpcd ###
+# PLM P160916-00376 G930V_NN
+# NRopen avc:  denied  { read } for  pid=776 comm="adsprpcd" name="fluence_voiceplus_module.so.1" dev="sdd7" ino=27 scontext=u:r:adsprpcd:s0 tcontext=u:object_r:unlabeled:s0 tclass=file permissive=0
+# NRopen avc:  denied  { read } for  pid=776 comm="adsprpcd" name="mmecns_module.so.1" dev="sdd7" ino=31 scontext=u:r:adsprpcd:s0 tcontext=u:object_r:unlabeled:s0 tclass=file permissive=0
+auditfilter adsprpcd unlabeled:file read;
+
+### cameraserver ###
+# avc:  denied  { read } for  pid=20457 comm="CAM_stMachine" name="fastrpc_shell_0" dev="sdd7" ino=26 scontext=u:r:cameraserver:s0 tcontext=u:object_r:unlabeled:s0 tclass=file permissive=0
+auditfilter cameraserver unlabeled:file read;
+
+### debuggerd ###
+# P160929-04387 heroltexx/herolte:7.0/NRD90M/G930FXXU1ZPIF
+# when debuggerd dump the app prcess, it has the direct open to app data files.
+# avc:  denied  { search } for  pid=1316 comm="debuggerd" name="com.ahzs.hggoogle" dev="sda18" ino=462694 scontext=u:r:debuggerd:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0
+auditfilter debuggerd app_data_file:dir search;
+
+# P170209-03477
+# avc:  denied  { read } for  pid=20901 comm="debuggerd" path="/data/knox/data/150/com.funshion.video.mobile/app_bin/daemon" dev="dm-1" ino=522740 scontext=u:r:debuggerd:s0 tcontext=u:object_r:app_data_file:s0:c662,c768 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0004 unfiltered
+auditfilter debuggerd app_data_file:file read;
+
+### drmserver ###
+# PLM P160916-00376 G930V_NN
+# NRopen avc:  denied  { create } for  pid=713 comm="drmserver" name="playReadyTimeDiff.dat" scontext=u:r:drmserver:s0 tcontext=u:object_r:system_data_file:s0 tclass=file permissive=0
+auditfilter drmserver system_data_file:file create;
+
+### energyawareness ###
+# log from P160921-01434
+# avc:  denied  { write } for  pid=630 comm="energy-awarenes" name="ptable" dev="debugfs" ino=17704 scontext=u:r:energyawareness:s0 tcontext=u:object_r:debugfs:s0 tclass=file permissive=0
+auditfilter energyawareness debugfs:file write;
+
+### priv_app ###
+# P170323-05389        com.google.android.gms.persistent
+# avc:  denied  { read } for  pid=2938 comm="GoogleLocationS" name="gpu_memory" dev="debugfs" ino=9432 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:debugfs:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0005 unfiltered
+auditfilter priv_app debugfs:file read; comm="GoogleLocationS" name="gpu_memory"
+
+### init ###
+# PLM P160916-00376 G930V_NN
+auditfilter init efsblk_device:blk_file relabelfrom;
+auditfilter init system_block_device:blk_file relabelfrom;
+auditfilter init userdata_block_device:blk_file relabelfrom;
+# avc:  denied  { relabelfrom } for  pid=2933 comm="init" name="dm-0" dev="tmpfs" ino=3714 scontext=u:r:init:s0 tcontext=u:object_r:dm_device:s0 tclass=blk_file permissive=0
+auditfilter init dm_device:blk_file relabelfrom;
+
+# P161004-01513 heroqltetmo/heroqltetmo:7.0/NRD90M/G930TUVU4ZPIF
+# avc:  denied  { relabelfrom } for  pid=1 comm="init" name="icd" dev="tmpfs" ino=15737 scontext=u:r:init:s0 tcontext=u:object_r:icd_device:s0 tclass=file permissive=0
+# avc:  denied  { relabelfrom } for  pid=1 comm="init" name="icdr" dev="tmpfs" ino=15738 scontext=u:r:init:s0 tcontext=u:object_r:icd_device:s0 tclass=file permissive=0
+auditfilter init icd_device:file relabelfrom;
+
+# P170411-07025
+# SM-G615F
+# avc:  denied  { relabelfrom } for  pid=1 comm="init" name="trace_marker" dev="tracefs" ino=2096 scontext=u:r:init:s0 tcontext=u:object_r:debugfs_trace_marker:s0 tclass=file permissive=0 SEPF_SM-G615F_7.0_0008 unfiltered
+auditfilter init debugfs_trace_marker:file relabelfrom;
+
+### qti_init_shell ###
+# P161021-02976 
+# avc:  denied  { write } for  pid=2789 comm="sh" name="interactive" dev="sysfs" ino=39397 scontext=u:r:qti_init_shell:s0 tcontext=u:object_r:sysfs:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.0_0002
+auditfilter qti_init_shell sysfs:dir write; name="interactive"
+
+### system_server ###
+# P160928-04340
+# TG: ActivityManagerService.java handleApplicationCrash
+# /system/bin/sh /system/bin/am dumpheap 918(callingPID) /data/log/hprof-oom.hprof
+# avc:  denied  { execute } for  pid=1403 comm="am" name="app_process64" dev="sda14" ino=750 scontext=u:r:system_server:s0 tcontext=u:object_r:zygote_exec:s0 tclass=file permissive=0
+auditfilter system_server zygote_exec:file execute; comm="am"
+
+# P161004-03127 SM-G935F_EUR_NN_XX
+# avc:  denied  { read } for  pid=12343 comm="Binder:4430_5" path="/storage/emulated/0/wiz/bell/사계겨울2악장-비발디_후렴.mp3" dev="fuse" ino=2899 scontext=u:r:system_server:s0 tcontext=u:object_r:fuse:s0 tclass=file permissive=0
+auditfilter system_server fuse:file read;
+
+
+### toolbox ###
+# service umount_cpdump /system/bin/umount /cpdump
+# service umount_service /system/bin/umount -D /preload -> TG : vold, onegun.lee(in progressing)
+# avc:  denied  { sys_admin } for  pid=7001 comm="umount" capability=21  scontext=u:r:toolbox:s0 tcontext=u:r:toolbox:s0 tclass=capability permissive=0
+auditfilter toolbox toolbox:capability sys_admin; comm="umount"
+
+### tunman ###
+# PLM P161002-00091 SM-G9350_CHN_NN_CHC
+# tunman open with write/create mode some file in tunman folder(ex: /data/tunman/xxx)
+# TG should fix this denial. TG : jiaba.chen@samsung.com, yuanheng.lan@samsung.com
+# NRopenat avc:  denied  { write } for  pid=19310 comm="tunman" name="tunman" dev="dm-1" ino=393223 scontext=u:r:tunman:s0 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0
+auditfilter tunman system_data_file:dir write; name="tunman"
+
+### vcsFPService ###
+# N Booting Denials G955F_NN
+# temporary code(~10/8)
+# avc:  denied  { write } for  pid=3057 comm="vcsFPService" name="/" dev="tmpfs" ino=11034 scontext=u:r:vcsFPService:s0 tcontext=u:object_r:device:s0 tclass=dir permissive=0
+auditfilter vcsFPService device:dir write; comm="vcsFPService"
+
+### vold ###
+# P161004-03127 sysfs_android_usbfd inherit denial
+auditfilter fsck sec_efs_file:file read;
+auditfilter sdcardd sec_efs_file:file read;
+
+### radio ###
+# P170208-00207, P170324-00135 
+# avc:  denied  { execute } for  pid=16455 comm="androidmapsapi-" path="/data/data/com.google.android.gms/app_chimera/m/00000000/oat/arm64/DynamiteModulesA_GmsCore_prodmnc_alldpi_release.odex" dev="dm-1" ino=1179706 scontext=u:r:radio:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0004 unfiltered
+# avc:  denied  { execute } for  pid=16987 comm="m.samsung.crane" path="/data/user_de/0/com.google.android.gms/app_chimera/m/00000002/oat/arm/DynamiteModulesB_GmsCore_prodmnc_xhdpi_release.odex" dev="dm-1" ino=131933 scontext=u:r:radio:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0005 unfiltered
+auditfilter radio app_data_file:file execute; comm="androidmapsapi-"
+auditfilter radio app_data_file:file execute; comm="m.samsung.crane"
+
+# P170118-03851, P161220-02605
+# avc:  denied  { read } for  pid=3261 comm="sgdisk" path="/dev/block/sda4" dev="tmpfs" ino=19720 scontext=u:r:sgdisk:s0 tcontext=u:object_r:paramblk_device:s0 tclass=blk_file permissive=0 SEPF_SECMOBILE_7.0_0004
+auditfilter sgdisk paramblk_device:blk_file read; comm="sgdisk"
+
+### perfd ###
+# http://mobilerndhub.sec.samsung.net/hub/site/seandroid/board/N_review_request/view/22289595
+# avc:  denied  { sys_ptrace } for  pid=4522 comm="perfd" capability=19  scontext=u:r:perfd:s0 tcontext=u:r:perfd:s0 tclass=capability permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter perfd perfd:capability sys_ptrace;
+
+########### End of TG issue : Remove it after Fix ###########
+
+
+
+########### appdomain ###########
+### system_app ###
+# P160921-01434 : denial from UEventObserver
+# avc:  denied  { net_admin } for  pid=7898 comm="UEventObserver" capability=12  scontext=u:r:system_app:s0 tcontext=u:r:system_app:s0 tclass=capability permissive=0
+auditfilter system_app system_app:capability net_admin;
+
+### platform_app ###
+
+### untrusted_app ###
+# PLM P160926-03920
+# avc:  denied  { ioctl } for  pid=1448 comm="LongWork-0" path="socket:[1232276]" dev="sockfs" ino=1232276 ioctlcmd=8927 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=tcp_socket permissive=0 
 auditfilter untrusted_app untrusted_app:{ tcp_socket udp_socket } ioctl; dev="sockfs"
-# com.microsoft.cortana
-auditfilter untrusted_app debugfs:file ioctl;
-auditfilter untrusted_app surfaceflinger:unix_stream_socket ioctl;
-# com.google.android.apps.docs.editors.docs
-auditfilter untrusted_app unlabeled:file 0x800000;
 
-#P161010-02585 N930FXXU2BPJ4 system/etc/ lsattr command
-#avc:  denied  { ioctl } for  pid=686 comm="lsattr" path="/system/etc/ppp" dev="dm-0" ino=1647 ioctlcmd=6601 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:ppp_system_file:s0 tclass=dir permissive=0
-#avc:  denied  { ioctl } for  pid=686 comm="lsattr" path="/system/etc/security/.drm" dev="dm-0" ino=1779 ioctlcmd=6601 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:drm_security_system_file:s0 tclass=dir permissive=0 
-allow untrusted_app drm_security_system_file:dir ioctl;
-allow untrusted_app ppp_system_file:dir ioctl;
+# avc:  denied  { ioctl } for  pid=16612 comm=".android.smcard" path="socket:[692802]" dev="sockfs" ino=692802 ioctlcmd=8927 scontext=u:r:trustonicpartner_app:s0:c512,c768 tcontext=u:r:trustonicpartner_app:s0:c512,c768 tclass=udp_socket permissive=0 SEPF_SECMOBILE_7.0_0004 unfiltered
+auditfilter trustonicpartner_app trustonicpartner_app:{ tcp_socket udp_socket } ioctl; dev="sockfs"
 
-#P160610-04329 / com.UCMobile.intl / Grace US VERIZON / SEPF_SECMOBILE_6.0.1_0013
-auditfilter untrusted_app system_data_file:dir setattr;
+#  avc:  denied  { read } for  pid=8328 comm=637269747465726369736D20646174 name="mem" dev="debugfs" ino=610909 scontext=u:r:trustonicpartner_app:s0:c512,c768 tcontext=u:object_r:sec_debugfs:s0 tclass=file permissive=0
+auditfilter trustonicpartner_app sec_debugfs:file read;
 
-# MLS denial, /data/user/10/com.android.settings/app_fonts/sans.loc
-auditfilter { aasa_platform_app carrier_app platform_app radio } system_app_data_file:dir search; name="com.android.settings"
+# P160927-01063 com.smc.mobile.pguidea
+# thread(find/-name su) avc:  denied  { getattr } for  pid=16027 comm="find" path="/dev/hw_random" dev="tmpfs" ino=3683 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:hw_random_device:s0 tclass=chr_file permissive=0
+# avc:  denied  { getattr } for  pid=16027 comm="find" path="/dev/fuse" dev="tmpfs" ino=3626 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:fuse_device:s0 tclass=chr_file permissive=0
+# avc:  denied  { getattr } for  pid=16027 comm="find" path="/dev/block/sda11" dev="tmpfs" ino=3500 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:frp_block_device:s0 tclass=blk_file permissive=0
+auditfilter untrusted_app { fuse_device hw_random_device }:chr_file getattr;
+auditfilter untrusted_app frp_block_device:blk_file getattr;
 
-#P160628-04782 KEA app / delete a compare parameter(name="com.android.settings") for BBC case
-auditfilter { filtered_untrusted_app isolated_app llk_untrusted_app sec_untrusted_app untrusted_app vzwfiltered_untrusted_app } system_app_data_file:dir search;
+# P160927-01063 com.smc.mobile.pguidea
+# avc:  denied  { getattr } for  pid=3548 comm="find" path="/dev/__properties__/u:object_r:mmc_prop:s0" dev="tmpfs" ino=2519 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:mmc_prop:s0 tclass=file permissive=0
+# avc:  denied  { getattr } for  pid=3548 comm="find" path="/dev/__properties__/u:object_r:device_logging_prop:s0" dev="tmpfs" ino=2520 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:device_logging_prop:s0 tclass=file permissive=0
+auditfilter untrusted_app { device_logging_prop mmc_prop }:file getattr;
 
-# P160415-05796 /data/data/com.android.settings/app_fonts/sans.loc / user0 path but it is not necessary for plugin_app
-auditfilter mrst_plugin_app system_app_data_file:dir search; name="com.android.settings"
+# WORKWROUND FOR CTS --t android.permission.cts.FileSystemPermissionTest#testAllCharacterDevicesAreSecure
+# pmsg_device is worldwritable, but can be PASS with removing getattr perms. 
+auditfilter untrusted_app pmsg_device:chr_file getattr;
 
-# P160924-00845 SM-C9000_CHN_CHC
-# com.tencent.qqlive:services
-# avc:  denied  { setattr } for  pid=8500 comm="TMAssistantDown" name="default" dev="tmpfs" ino=243 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:storage_file:s0 tclass=dir permissive=0
-auditfilter untrusted_app storage_file:dir setattr;
-# com.ts.batterystatus
-# avc:  denied  { read } for  pid=14691 comm="s.batterystatus" name="temperature" dev="sysfs" ino=21508 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_sec:s0 tclass=file permissive=0
-auditfilter untrusted_app sysfs_sec:file read;
+# P160929-04387 herolte:7.0/NRD90M/G930FXXU1ZPIF
+# com.legogo.browser executed a new process, /data/user/0/com.legogo.browser/files/daemon com.legogo.browser/com.doit.aar.applock.service.AppLockService
+# N OS neverallow rule.
+auditfilter untrusted_app properties_serial:file execute;
 
+# P160927-04739 com.dianxinos.dxbs
+# avc:  denied  { read } for  pid=10674 comm="pool-6-thread-1" name="u:object_r:system_security_prop:s0" dev="tmpfs" ino=2415 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:system_security_prop:s0 tclass=file permissive=0
+auditfilter untrusted_app system_security_prop:file read;
+
+# P161004-01832 SM-G935F_EUR_NN_XX
+# com.ebcard.bustago
+# avc:  denied  { read } for  pid=27244 comm="find" name="subsystem" dev="sysfs" ino=18665 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_hwrandom:s0 tclass=lnk_file permissive=0
+# avc:  denied  { read } for  pid=25825 comm="find" name="bdi" dev="sysfs" ino=20465 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_zram:s0 tclass=lnk_file permissive=0
+# P170614-04846
+# avc:  denied  { read } for  pid=6383 comm="Thread-266" name="subsystem" dev="sysfs" ino=34720 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_hwrandom:s0 tclass=lnk_file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app sysfs_hwrandom:lnk_file read;
+auditfilter untrusted_app sysfs_zram:lnk_file read; comm="find"
+
+# P161004-04042 SM-G935F_EUR_NN_XX 3rd party app denial
+# jp.co.johospace.jorte avc:  denied  { search } for  pid=3301 comm="Thread-13" name="com.skms.android.agent" dev="dm-1" ino=262190 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:system_app_data_file:s0 tclass=dir permissive=0
+auditfilter untrusted_app system_app_data_file:dir search;
+
+# P170124-07845
+# when untrusted_app search directories under /data/data, if some package directory has 644 permission, then below denials are occurred.
+auditfilter untrusted_app radio_data_file:dir search;
+auditfilter untrusted_app aasa_service_app_data_file:dir search;
+
+# P161004-04042 SM-G935F_EUR_NN_XX neverallow rule, anr_data_file
+# com.ningso.samsung - avc:  denied  { read } for  pid=26344 comm=".ningso.samsung" name="anr" dev="dm-1" ino=524291 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:anr_data_file:s0 tclass=dir permissive=0
+auditfilter untrusted_app anr_data_file:dir read;
+
+# P170112-01702 neverallow rule
+# com.amazon.kindle
+auditfilter untrusted_app anr_data_file:file read;
+
+# PL(woohui.kim) request : OneStoreService denied (com.skt.skaf.OA00018282)
+# avc:  denied  { read } for  pid=6197 comm="skaf.OA00018282" name="default.prop" dev="rootfs" ino=8630 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:rootfs:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0002
+auditfilter untrusted_app rootfs:file read; comm="skaf.OA00018282" 
+
+# P161124-02548 com.smc.mobile.pguidea
+# avc:  denied  { getattr } for  pid=29288 comm="find" path="/dev/__properties__/u:object_r:recovery_prop:s0" dev="tmpfs" ino=13154 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:recovery_prop:s0 tclass=file permissive=0
+# avc:  denied  { getattr } for  pid=29288 comm="find" path="/dev/__properties__/u:object_r:safemode_prop:s0" dev="tmpfs" ino=13165 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:safemode_prop:s0 tclass=file permissive=0
+# avc:  denied  { getattr } for  pid=29288 comm="find" path="/dev/__properties__/u:object_r:user_prop:s0" dev="tmpfs" ino=13152 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:user_prop:s0 tclass=file permissive=0
+# avc:  denied  { getattr } for  pid=29288 comm="find" path="/dev/mem" dev="tmpfs" ino=3476 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:kmem_device:s0 tclass=chr_file permissive=0
+# avc:  denied  { read } for  pid=29288 comm="find" name="bdi" dev="sysfs" ino=28447 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_vnswap:s0 tclass=lnk_file permissive=0
+# P170614-04846
+# avc:  denied  { read } for  pid=6383 comm="Thread-266" name="bdi" dev="sysfs" ino=44104 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_vnswap:s0 tclass=lnk_file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app { recovery_prop safemode_prop user_prop }:file getattr; comm="find"
+auditfilter untrusted_app kmem_device:chr_file getattr; comm="find"
+auditfilter untrusted_app sysfs_vnswap:lnk_file read;
+
+#P161228-02118 com.smc.mobile.pguidea / find -name su
+#avc:  denied  { read } for  pid=20817 comm="find" name="midi.0" dev="configfs" ino=19543 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:configfs:s0 tclass=lnk_file permissive=0 SEPF_SECMOBILE_7.0_0002
+auditfilter untrusted_app configfs:lnk_file read; comm="find"
+
+# P161213-04558, P161214-01624
+# This rule can make sluggish
+auditfilter zygote untrusted_app:process ptrace;
+
+# P161219-04736
+# neverallow untrusted_app file_type:file link;
+# avc:  denied  { link } for  pid=4452 comm=".android.reader" name="3336a65c52528c9c368e942d3dd307f8-le32d4.cache-3.TMP-17CUwn" dev="sda25" ino=393785 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0
+auditfilter untrusted_app app_data_file:file link;
+
+# P170418-03798
+# It is cmcc operater customered app
+# avc:  denied  { write } for  pid=28698 comm="c10086.activity" name="com.greenpoint.android.mc10086.activity" dev="mmcblk1p1" ino=1171 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:vfat:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app vfat:dir write; comm="c10086.activity" name="com.greenpoint.android.mc10086.activity"
+
+# P161221-03251, P161221-00307 
+# avc:  denied  { set } for property=ro.dbg.coresight.cfg_file pid=944 uid=0 gid=0 scontext=u:r:qti_init_shell:s0 tcontext=u:object_r:coresight_prop:s0 tclass=property_service permissive=0
+# avc:  denied  { write } for  pid=844 comm="sh" name="wdog_trace_enable" dev="debugfs" ino=8892 scontext=u:r:qti_init_shell:s0 tcontext=u:object_r:debugfs:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0002
+# N MR1 Booting Denial
+# /system/bin/sh /persist/coresight/qdss.agent.shpost-boot /system/etc/init.qcom.debug.sh
+# avc:  denied  { open } for  pid=8617 comm="sh" path="/sys/kernel/debug/osm/pwrcl_clk/wdog_trace_enable" dev="debugfs" ino=9320 scontext=u:r:qti_init_shell:s0 tcontext=u:object_r:debugfs:s0 tclass=file permissive=1 SEPF_SECMOBILE_7.1.1_0000 unfiltered
+# P170510-01440
+# avc:  denied  { write } for  pid=631 comm="sh" name="tracing_on" dev="tracefs" ino=5231 scontext=u:r:qti_init_shell:s0 tcontext=u:object_r:debugfs_tracing:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter qti_init_shell coresight_prop:property_service set;
+auditfilter qti_init_shell debugfs:file { write open };
+auditfilter qti_init_shell debugfs_tracing:file write;
+
+# P170118-07453
+# request by sunmi00.kwon@samsung.com
+# It dosen't effect to real function.
+# type=1400 audit(1484583190.680:306): avc:  denied  { search } for  pid=15861 comm=".filterprovider" name="com.samsung.android.provider.filterprovider" dev="dm-1" ino=262150 scontext=u:r:platform_app:s0:c522,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_7.0_0004
+auditfilter platform_app app_data_file:dir search; comm=".filterprovider" name="com.samsung.android.provider.filterprovider"
+
+# P170128-00710 
+# avc:  denied  { read } for  pid=28608 comm="e.android.phone" name="mem" dev="debugfs" ino=820875 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sec_debugfs:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0004 unfiltered
+# P170128-00246 
+# avc:  denied  { read } for  pid=22732 comm="ErrorReportingT" name="mem" dev="debugfs" ino=1802446 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sec_debugfs:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0004 unfiltered
+# P170127-00631 
+# avc:  denied  { read } for  pid=25733 comm="Thread-5" name="mem" dev="debugfs" ino=383382 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sec_debugfs:s0 tclass=file permissive=0 type=1327 audit(1485386676.855:552): proctitle="co.rottz.realkakuro"
+# neverallow untrusted_app debugfs_type:file read;
+auditfilter untrusted_app sec_debugfs:file read;
+
+# P170127-00630 
+# avc:  denied  { write } for  pid=11989 comm="iop" path="/data/knox/data/100/EN.FYbjLm6ubBY1ZUYxJ5OVcAyCeynel0ezMl0ku6l.IQx.PzZY7DSZoSFGHuPTOFAekqmkDQUqUO2ibkxJEDOmyTHJh0GYMqozuTeE/EN.FWbjLm6ubBY1ZUYxJ5OVcAyCeynel0ezMl0kYp.wbvq8rQcYx2oupoDjoU--/EN.FXbjLm6ubBY1ZUYxJ5OVcAyCeynel0ezMl0kA.-sbdoSNTbiuzbFZ2-atlBN6TVFfsrfWZRrVInKY3E-" dev="sda25" ino=1440114 scontext=u:r:dumpstate:s0 tcontext=u:object_r:app_data_file:s0:c612,c768 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0004
+auditfilter dumpstate app_data_file:file write;
+
+# P170213-02015
+# avc:  denied  { write } for  pid=16455 comm="iop" path="/data/knox/data/100/EN.FXZZSXPkzIIoF-ZSNSg-BxO31KCYbNsflS2JCP1i4ZCRV0ZQuP4Gt54qIKZEPhmp9wb55k2sYGFqukk-/EN.FWZZSXPkzIIoF-ZSNSg-BxO31KCYbNsflS2JOKK46uuBUXtPBZi9Mv3W6U--/EN.FYZZSXPkzIIoF-ZSNSg-BxO31KCYbNsflS2JCP1i4ZCRV0ZQuP4Gt54qIKZEPhmp9wb55k2sYGFquknv54I0oYZRiBlGGGsHfVUL" dev="dm-1" ino=1245655 scontext=u:r:dumpstate:s0 tcontext=u:object_r:system_app_data_file:s0 tclass=file permissive=0
+auditfilter dumpstate system_app_data_file:file write;
+
+# board/N_review_request/view/21974971
+# avc:  denied  { read } for  pid=19807 comm="iop" name="com.android.nfc" dev="dm-0" ino=131258 scontext=u:r:dumpstate:s0 tcontext=u:object_r:nfc_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter dumpstate nfc_data_file:dir read; comm="iop" name="com.android.nfc"
+
+# http://mobilerndhub.sec.samsung.net/hub/site/seandroid/board/N_review_request/view/22117527
+# requester : jae.kim@samsung.com
+# avc: denied { search } for pid=15422 comm="iop" name="DAK" dev="sda6" ino=122 scontext=u:r:dumpstate:s0 tcontext=u:object_r:prov_efs_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter dumpstate prov_efs_file:dir search; comm="iop" name="DAK"
+
+# P170130-00994 
+# com.nhnent.payapp
+# neverallow { appdomain -system_app -shell } kernel:system syslog_read;
+# avc:  denied  { syslog_read } for  pid=9654 comm="dmesg" scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:kernel:s0 tclass=system permissive=0 SEPF_SECMOBILE_7.0_0004 unfiltered
+auditfilter untrusted_app kernel:system syslog_read;
+
+# board/N_review_request/view/21733557
+# board/N_review_request/view/21735670
+# some system_app's dex is not updated after FOTA, it will be re-made by dex2oat after next re-boot or after 72 min. so it can be ignored.
+# normal app cases might be blocked DAC side.
+# avc:  denied  { write } for  pid=20472 comm="id.smartfitting" name="system@app@SmartFittingService@SmartFittingService.apk@classes.dex" dev="dm-1" ino=607 scontext=u:r:system_app:s0 tcontext=u:object_r:dalvikcache_data_file:s0 tclass=file
+# avc:  denied  { write } for  pid=26042 comm="oid.sm.provider" name="system@priv-app@SmartManager_v5@SmartManager_v5.apk@classes.dex" dev="dm-1" ino=733 scontext=u:r:system_app:s0 tcontext=u:object_r:dalvikcache_data_file:s0 tclass=file
+auditfilter system_app dalvikcache_data_file:file write;
+
+# P170414-00369
+# avc:  denied  { search } for  pid=25568 comm="t.event.handler" name="com.dsi.ant.server" dev="dm-1" ino=655744 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:bluetooth_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.0_0007 unfiltered
+# proctitle="com.glassdoor.app" unfiltered
+# P170612-03254
+# avc:  denied  { search } for  pid=557 comm="Thread-42" name="com.dsi.ant.server" dev="dm-1" ino=570 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:bluetooth_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app bluetooth_data_file:dir search; name="com.dsi.ant.server"
+
+# P170612-03254
+# avc:  denied  { search } for  pid=557 comm="Thread-42" name="com.qualcomm.location.XT" dev="dm-1" ino=827 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:location_app_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app location_app_data_file:dir search; name="com.qualcomm.location.XT"
+
+# P170417-03694
+# avc:  denied  { create } for  pid=14955 comm="Thread-16" scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=netlink_tcpdiag_socket permissive=0 SEPF_SM-G615F_7.0_0008 unfiltered
+# proctitle="com.opera.max.oem"
+auditfilter untrusted_app untrusted_app:netlink_tcpdiag_socket create;
+
+# P170413-00278
+# avc:  denied  { create } for  pid=11829 comm="tv.dvrscheduler" scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=netlink_kobject_uevent_socket permissive=0 SEPF_SECMOBILE_7.0_0007 unfiltered
+auditfilter untrusted_app untrusted_app:netlink_kobject_uevent_socket create;
+
+# P170605-01226 
+# avc:  denied  { read } for  pid=11941 comm="Thread-56" name="info.extra" dev="mmcblk0p19" ino=2264 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:info_extra_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0009 unfiltered
+# avc:  denied  { read } for  pid=18964 comm="Thread-60" name=4F7665722074686520486F72697A6F6E2E6D7033 dev="mmcblk0p21" ino=20 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:hidden_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0009 unfiltered
+# proctitle="com.estsoft.alyac"
+auditfilter untrusted_app info_extra_file:file read;
+auditfilter untrusted_app hidden_file:file read;
 
 ########### non-appdomain ###########
 
-### argosd ###
-## S.LSI sysfs governor issue 
-# auditfilter argosd sysfs:file setattr; dev="sysfs" fixed CL6736329
+# P170211-00326
+# avc:  denied  { open } for  pid=12369 comm="main" path="/mnt/asec/com.samsung.context.hwlogcollector-1/base.apk" dev="dm-2" ino=12 scontext=u:r:dex2oat:s0 tcontext=u:object_r:asec_apk_file:s0 tclass=file permissive=0
+auditfilter dex2oat asec_apk_file:file open; path="/mnt/asec/com.samsung.context.hwlogcollector-1/base.apk"
 
-### dumpstate ###
-# P160121-03556 bugreport executed am to broadcast android.intent.action.BUGREPORT_FINISHED to com.android.shell/.BugreportReceiver
-auditfilter dumpstate dalvikcache_data_file:{ dir file } write;
-# avc:  denied  { write } for  pid=23290 comm="app_process" name="system@framework@boot.art" dev="dm-1" ino=458761 scontext=u:r:dumpstate:s0 tcontext=u:object_r:dalvikcache_data_file:s0 tclass=file permissive=0
-# avc:  denied  { write } for  pid=23290 comm="main" name="arm64" dev="dm-1" ino=458757 scontext=u:r:dumpstate:s0 tcontext=u:object_r:dalvikcache_data_file:s0 tclass=dir permissive=0
+# P170606-00237
+# avc:  denied  { open } for  pid=9153 comm="main" path="/mnt/asec/com.samsung.android.bixby.report-1/base.apk" dev="dm-2" ino=12 scontext=u:r:dex2oat:s0 tcontext=u:object_r:asec_apk_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# P170718-03491
+# avc:  denied  { open } for  pid=18765 comm="main" path="/mnt/asec/com.samsung.android.bixby.report-2/base.apk" dev="dm-2" ino=12 scontext=u:r:dex2oat:s0 tcontext=u:object_r:asec_apk_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# P170714-02442
+# avc:  denied  { open } for  pid=30252 comm="main" path="/mnt/asec/com.samsung.android.bixby.report-2/base.apk" dev="dm-2" ino=12 scontext=u:r:dex2oat:s0 tcontext=u:object_r:asec_apk_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter dex2oat asec_apk_file:file open; comm="main"
 
-### fingerprintd ###
-## S.LSI sysfs governor issue 
-# auditfilter fingerprintd sysfs:file setattr; dev="sysfs" fixed CL6736329
+# P170417-03700 
+# There is no one who in charge of md_monitor.
+# avc:  denied  { open } for  pid=431 comm="md_monitor" path="/data/md_mon/mdlog_mon1_config" dev="dm-1" ino=524298 scontext=u:r:md_monitor:s0 tcontext=u:object_r:system_data_file:s0 tclass=file permissive=0 SEPF_SM-G615F_7.0_0008 unfiltered
+auditfilter md_monitor system_data_file:file open; path="/data/md_mon/mdlog_mon1_config"
 
-### fingerprintd ###
-# neverallow rule of google security
-auditfilter gpsd gpsd:capability2 block_suspend;
+# P170420-02771
+# avc:  denied  { write } for  pid=9436 comm="Chrome_InProcGp" name="property_service" dev="tmpfs" ino=11331 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:property_socket:s0 tclass=sock_file permissive=0 SEPF_SM-G615F_7.0_0008 unfiltered
+# neverallow rule
+auditfilter untrusted_app property_socket:sock_file write;
 
-# board/Request/view/21512270; P161122-06423
-# avc:  denied  { use } for  pid=17718 comm="dumpsys" path="/storage/emulated/0/ACT_LOGS/temp/ANR_77028501774712f7_20161118_191222/act_dumpstate.txt" dev="sdcardfs" ino=66317 scontext=u:r:fingerprintd:s0 tcontext=u:r:radio:s0 tclass=fd permissive=0 SEPF_SECMOBILE_6.0.1_0031
-auditfilter fingerprintd radio:fd use;
+# P170419-03510, P170424-02725
+# avc:  denied  { read } for  pid=26584 comm=4A6F62202335 name="ueventd.qcom.rc" dev="rootfs" ino=2991 scontext=u:r:untrusted_app:s0:c612,c768 tcontext=u:object_r:rootfs:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0007 unfiltered
+auditfilter untrusted_app rootfs:file read; dev="rootfs"
 
-### kernel ###
-auditfilter kernel self:capability sys_ptrace;
+# P170527-01911
+# avc:  denied  { read } for  pid=25851 comm="Thread-52" name="iSerial" dev="sysfs" ino=27407 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_android_usb:s0 tclass=file permissive=0 SEPF_SM-C7100_7.1.1_0001 unfiltered
+auditfilter untrusted_app sysfs_android_usb:file read; comm="Thread-52" name="iSerial"
 
+# P170506-00817
+# avc:  denied  { call } for  pid=9225 comm="dumpsys" scontext=u:r:dumpstate:s0 tcontext=u:r:update_engine:s0 tclass=binder permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter dumpstate update_engine:binder call; comm="dumpsys"
 
-### netd ###
-# P160419-00321 unauthorized untrusted_app commnunicated with netd via fifo.
-# strongly restrict unknown operation.
-auditfilter netd untrusted_app:fifo_file write;
-# avc:  denied  { write } for  pid=1877 comm="netd" path="pipe:[930756]" dev="pipefs" ino=930756 scontext=u:r:netd:s0 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=fifo_file permissive=0 SEPF_SECMOBILE_6.0.1_0010avc:  denied  { write } for  pid=1877 comm="netd" path="pipe:[930756]" dev="pipefs" ino=930756 scontext=u:r:netd:s0 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=fifo_file permissive=0 SEPF_SECMOBILE_6.0.1_0010
-# P160603-00215 Security Notice pop up during idle (Module info: /system/bin/netd) 
-# avc:  denied  { write } for  pid=1678 comm="netd" path="/data/data/com.facebook.orca/shared_prefs/rti.mqtt.addresses.xml" dev="dm-1" ino=393846 scontext=u:r:netd:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0 SEPF_SECMOBILE_6.0.1_0013
-# Due to " neverallow netd { app_data_file system_data_file }:dir_file_class_set write; "
-auditfilter netd app_data_file:file write; path="/data/data/com.facebook.orca/shared_prefs/rti.mqtt.addresses.xml"
+# http://mobilerndhub.sec.samsung.net/hub/site/seandroid/board/N_review_request/view/22050903
+# Requester : jm_0512.park@samsung.com
+# avc:  denied  { use } for  pid=21413 comm="dumpsys" path="pipe:[749571]" dev="pipefs" ino=749571 scontext=u:r:remotedisplay:s0 tcontext=u:r:system_app:s0 tclass=fd permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter remotedisplay system_app:fd use; comm="dumpsys"
 
+# P170621-00931, P170707-01709
+# avc:  denied  { read } for  pid=15397 comm="Thread-12" name="rtt_dump.txt" dev="dm-1" ino=1310729 scontext=u:r:system_app:s0 tcontext=u:object_r:sf_rtt_file:s0 tclass=file permissive=0 SEPF_SM-C7100_7.1.1_0001 unfiltered
+auditfilter system_app sf_rtt_file:file read; name="rtt_dump.txt"
 
-### qti_init_shell ###
-auditfilter qti_init_shell dalvikcache_data_file:dir { add_name remove_name write };
-auditfilter qti_init_shell dalvikcache_data_file:file { create execute unlink write};
-auditfilter qti_init_shell dalvikcache_data_file:lnk_file read;
-auditfilter qti_init_shell servicemanager:binder call;
-auditfilter qti_init_shell system_server:binder call;
-auditfilter qti_init_shell zygote_exec:file { execute execute_no_trans};
+# P170529-02761 
+# avc:  denied  { call } for  pid=30767 comm=4173796E635461736B20233133 scontext=u:r:system_app:s0 tcontext=u:r:update_engine:s0 tclass=binder permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter system_app update_engine:binder call; comm="4173796E635461736B20233133"
 
+# P170613-04684 
+# avc:  denied  { getattr } for  pid=13669 comm="generateLogThre" path="/data/anr" dev="dm-1" ino=194310 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:anr_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app anr_data_file:dir getattr;
 
-### sdp_cryptod ###
-auditfilter sdp_cryptod system_data_file:dir write; dev="tmpfs"
+# P170614-04074 
+# avc:  denied  { search } for  pid=10201 comm="roid.phrasebook" name="com.nhn.android.phrasebook" dev="dm-1" ino=261993 scontext=u:r:untrusted_app:s0:c522,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# P170614-04378 
+# avc:  denied  { search } for  pid=10741 comm=4173796E635461736B202331 name="com.imbc.mini" dev="dm-1" ino=261927 scontext=u:r:untrusted_app:s0:c522,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app app_data_file:dir search;
 
-### sswap ###
-# auditfilter sswap untrusted_app:fd use; comm="bgcompact" fixed CL6766268
+# P170614-03245 
+# avc:  denied  { search } for  pid=30434 comm=4173796E635461736B202331 name="com.yandex.browser" dev="dm-1" ino=992 scontext=u:r:isolated_app:s0:c512,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter isolated_app app_data_file:dir search; name="com.yandex.browser"
 
-### system_server ###
-# auditfilter system_server app_data_file:file open; fixed by byungdeok.kim(Application R&D Group)
-# auditfilter system_server dex2oat_exec:file execute; name="dex2oat" fixed CL6808900
-# auditfilter system_server emmcblk_device:blk_file read; fixed CL6376288
-# auditfilter system_server app_data_file:lnk_file read; dev="ecryptfs" fixed by epmd team
-auditfilter system_server vfat:file read; dev="sdcardfs"
+# P170614-04846
+# avc:  denied  { getattr } for  pid=6383 comm="Thread-272" path="socket:[300517]" dev="sockfs" ino=300517 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:zygote:s0 tclass=unix_dgram_socket permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered 
+auditfilter untrusted_app zygote:unix_dgram_socket getattr;
 
+# http://mobilerndhub.sec.samsung.net/hub/site/seandroid/board/N_review_request/view/22072962
+# avc:  denied  { write } for  pid=29264 comm="ndroid.settings" path="/data/knox/data/150" dev="dm-1" ino=1638436 scontext=u:r:system_app:s0 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# avc:  denied  { write } for  pid=1073 comm="ecryptfs-kthrea" path="/data/knox/data/150" dev="dm-1" ino=1638436 scontext=u:r:kernel:s0 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter system_app system_data_file:dir write; comm="ndroid.settings"
+auditfilter kernel system_data_file:dir write; comm="ecryptfs-kthrea"
 
-### undefined_service ###
-auditfilter undefined_service shell_exec:file execute;
+# P170617-02163 
+# avc:  denied  { execmod } for  pid=4067 comm="weshare.jiekuan" path="/system/lib/libart.so" dev="dm-0" ino=1668 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:system_file:s0 tclass=file permissive=0 SEPF_SM-C7100_7.1.1_0001 unfiltered
+auditfilter untrusted_app system_file:file execmod;
 
+# P170617-02122  P170617-02112 
+# avc:  denied  { execmod } for  pid=29204 comm="m.youba.barcode" path="/system/lib/libart.so" dev="dm-0" ino=1668 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:system_file:s0 tclass=file permissive=0 SEPF_SM-C7100_7.1.1_0001 unfiltered
+# avc:  denied  { getattr } for  pid=8544 comm=557365725461736B202331 path="/data/anr/traces.txt" dev="dm-1" ino=1310726 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:anr_data_file:s0 tclass=file permissive=0 SEPF_SM-C7100_7.1.1_0001 unfiltered
+auditfilter untrusted_app anr_data_file:file getattr;
 
-### vold ###
-# auditfilter vold system_data_file:file create; managed by KNOX Service Group
-# auditfilter vold app_data_file:lnk_file read; dev="ecryptfs" fixed CL6731407
+# P170617-01398 P170617-01381 
+# avc:  denied  { write } for  pid=16604 comm=4173796E635461736B202332 name="fd" dev="proc" ino=223680 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=dir permissive=0 SEPF_SM-C7100_7.1.1_0001 unfiltered
+auditfilter untrusted_app untrusted_app:dir write;
 
-# P161018-01283, P161018-00719
-auditfilter vold dalvikcache_data_file:dir write; comm="vold"
+# P170620-03360
+# avc:  denied  { read } for  pid=14485 comm="sai.mediaplayer" name="accessory.0" dev="configfs" ino=11771 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:configfs:s0 tclass=lnk_file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app configfs:lnk_file read;
 
-### vdc ###
-# P160526-05365 / Once Security Notice during ics file sent via WiFi direct / SEPF_SECMOBILE_6.0.1_0012
-auditfilter vdc vold:netlink_socket { read write };
+# P170623-01454 
+# avc:  denied  { read } for  pid=16048 comm="Thread-60" name="iSerial" dev="sysfs" ino=27450 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_android_usb:s0 tclass=file permissive=0 SEPF_SM-C7100_7.1.1_0001 unfiltered
+auditfilter untrusted_app sysfs_android_usb:file read;
 
-### zygote ###
-auditfilter zygote zygote:capability sys_ptrace;
-auditfilter zygote untrusted_app:process ptrace;
+# P170627-00416
+# avc:  denied  { setattr } for  pid=25964 comm="highpool[0]" name="libAppDataSearch.so" dev="dm-1" ino=65771 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:apk_data_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter priv_app apk_data_file:file setattr;
 
-### sgdisk ###
-#P160524-01065 , P160519-00003 / confirmed by vold team(dragon.kwon, hshik.park) / SEPF_SECMOBILE_6.0.1_0011
-auditfilter sgdisk { firmware_file hidden_file }:file read;
+# P170627-02414
+# avc:  denied  { node_bind } for  pid=20418 comm="Thread-70" scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:node:s0 tclass=rawip_socket permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app node:rawip_socket node_bind;
 
-# P160704-01613 syscall=221 MSM8996 sys_execve, fd inherit denial
-# avc:  denied  { read } for  pid=708 comm="sgdisk" path="/dev/block/sda" dev="tmpfs" ino=15696 scontext=u:r:sgdisk:s0 tcontext=u:object_r:emmcblk_device:s0 tclass=blk_file permissive=0
-auditfilter sgdisk emmcblk_device:blk_file read;
+# P170701-01202
+# avc:  denied  { read } for  pid=27965 comm="Binder:27927_3" name="u:object_r:vpn_prop:s0" dev="tmpfs" ino=21530 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:vpn_prop:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app vpn_prop:file read;
 
-### mnld ### 
-# Mediatek deamon Booting denial
-# avc:  denied  { search } for  pid=277 comm="mnld" name="com.android.angryGps" dev="mmcblk0p29" ino=337 scontext=u:r:mnld:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=1 SEPF_SECMOBILE_6.0.1_0014
-auditfilter mnld app_data_file:dir search;
+# P170703-00252
+# avc:  denied  { read } for  pid=5951 comm=".katana:browser" name="core_pattern" dev="proc" ino=2896567 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:usermodehelper:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app usermodehelper:file read;
 
-##### AVC LOGS #####
+# P170630-04179
+# Requester : joongmin.ahn@samsung.com
+# avc:  denied  { append } for  pid=2924 comm="Thread-2" name="mhs.log" dev="dm-0" ino=457675 scontext=u:r:zygote:s0 tcontext=u:object_r:sec_wifi_data_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.0_0009 unfiltered
+auditfilter zygote sec_wifi_data_file:file append; name="mhs.log"
 
-# avc:  denied  { search } for  pid=1143 comm="Thread-55" name="jp.naver.linecamera.android" dev="dm-0" ino=327868 scontext=u:r:bluetooth:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0
-# avc:  denied  { search } for  pid=6202 comm="Binder_2" name="18589" dev="proc" ino=562288 scontext=u:r:bluetooth:s0 tcontext=u:r:platform_app:s0:c512,c768 tclass=dir permissive=0
-# avc:  denied  { search } for  pid=20582 comm="oid.inputmethod" name="com.sec.android.inputmethod" dev="sda18" ino=131216 scontext=u:r:platform_app:s0:c612,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir
-# avc:  denied  { search } for  pid=11362 comm="Thread-1321" name="com.sec.android.inputmethod" dev="dm-0" ino=130888 scontext=u:r:platform_app:s0:c613,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0 SEPF_SM-G930V_6.0_0002
-# avc:  denied  { search } for  pid=6107 comm="sung.android.sm" name="com.samsung.android.app.watchmanager" dev="sda17" ino=462873 scontext=u:r:system_app:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0
-# avc:  denied  { search } for  pid=9559 comm="sung.android.sm" name="com.android.providers.downloads" dev="dm-0" ino=262259 scontext=u:r:system_app:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0002
-# avc:  denied  { write } for  pid=14230 comm="Thread-1050" name="wifi" dev="sda17" ino=196625 scontext=u:r:system_app:s0 tcontext=u:object_r:wifi_data_file:s0 tclass=dir permissive=0
-# avc:  denied  { write } for  pid=15737 comm="Thread-756" name="wifi" dev="sda17" ino=196624 scontext=u:r:system_app:s0 tcontext=u:object_r:wifi_data_file:s0 tclass=dir permissive=0 SEPF_SM-N920S_6.0_0002 
-# avc:  denied  { open } for  pid=28441 comm="SharedPreferenc" path="/data/data/com.sec.android.app.voicenote/shared_prefs/Interview_RejectCall.xml" dev="sda17" ino=525186 scontext=u:r:system_server:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0
-# avc:  denied  { execute } for  pid=4402 comm="system_server" name="dex2oat" dev="sda20" ino=543 scontext=u:r:system_server:s0 tcontext=u:object_r:dex2oat_exec:s0 tclass=file permissive=0
-# avc:  denied  { read } for  pid=2041 comm="system_server" name="sda7" dev="tmpfs" ino=7687 scontext=u:r:system_server:s0 tcontext=u:object_r:emmcblk_device:s0 tclass=blk_file permissive=0
-# avc:  denied  { create } for  pid=488 comm="vold" name="ShortcutMap100.xml" scontext=u:r:vold:s0 tcontext=u:object_r:system_data_file:s0 tclass=file permissive=0 SEPF_SAMSUNG-SM-G930A_6.0_0002
+# P170705-00101 
+# avc:  denied  { read } for  pid=25772 comm="CTION_IDLE_MODE" name="authorize.xml" dev="dm-0" ino=1284 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:security_system_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter priv_app security_system_file:file read; comm="CTION_IDLE_MODE"
 
-####  Not allowed for untrusted_app
-####  com.metago.astro, com.estsoft.alyac : not allowed operation by SELinux security level protection.
-# avc:  denied  { search } for  pid=12115 comm="t.event.handler" name="com.samsung.android.spayfw" dev="dm-0" ino=131142 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:app_data_file:s0 tclass=dir permissive=0
-# avc:  denied  { link } for  pid=7287 comm="era.mini.native" name="thumb_sq%2Fm_mq_native:ad1330700_236087255_0" dev="sda18" ino=655839 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=file permissive=0
-# avc:  denied  { search } for  pid=1358 comm="t.event.handler" name="com.android.bluetooth" dev="sda18" ino=458984 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:bluetooth_data_file:s0 tclass=dir permissive=0
-# avc:  denied  { read } for  pid=19073 comm=4A6F62202331 name="full" dev="tmpfs" ino=15741 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:full_device:s0 tclass=chr_file permissive=0 SEPF_SAMSUNG-SM-G935A_6.0_0001 :  this is com.metago.astro application.
-# avc:  denied  { read } for  pid=19073 comm=4A6F62202331 name="mdss_rotator" dev="tmpfs" ino=15947 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:graphics_device:s0 tclass=chr_file permissive=0  :  this is com.metago.astro application.
-# avc:  denied  { create } for  pid=17252 comm=75546F7272656E74204E6174697665 scontext=u:r:untrusted_app:s0 tcontext=u:r:untrusted_app:s0 tclass=netlink_kobject_uevent_socket permissive=0
-#  end of untrusted_app
-# avc:  denied  { sys_ptrace } for  pid=3449 comm="pprr" capability=19  scontext=u:r:zygote:s0 tcontext=u:r:zygote:s0 tclass=capability permissive=0
-# avc:  denied  { ptrace } for  pid=8317 comm=".linecorp.LGRGS" scontext=u:r:zygote:s0 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=process permissive=0
-# avc:  denied  { write } for  pid=3228 comm="sdp_cryptod" name="0" dev="tmpfs" ino=15656 scontext=u:r:sdp_cryptod:s0 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0
-# avc:  denied  { search } for  pid=1323 comm="Binder_7" name="30302" dev="proc" ino=616227 scontext=u:r:bluetooth:s0 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=dir permissive=0 SEPF_SM-G930V_6.0_0002
-# avc:  denied  { read } for  pid=534 comm="vold" name="lib" dev="ecryptfs" ino=590881 scontext=u:r:vold:s0 tcontext=u:object_r:app_data_file:s0:c612,c768 tclass=lnk_file permissive=0
-# avc:  denied  { read } for  pid=3422 comm="Binder_A" name="lib" dev="ecryptfs" ino=590881 scontext=u:r:system_server:s0 tcontext=u:object_r:app_data_file:s0:c612,c768 tclass=lnk_file permissive=0
-# avc:  denied  { ioctl } for  pid=11686 comm="tv.dvrscheduler" path="socket:[77057]" dev="sockfs" ino=77057 ioctlcmd=8927 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=tcp_socket permissive=0 SEPF_SECMOBILE_6.0.1_0002 
-# avc:  denied  { ioctl } for  pid=14068 comm=474C54687265616420323631 path="socket:[70508]" dev="sockfs" ino=70508 ioctlcmd=8927 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=udp_socket permissive=0 
-# avc:  denied  { use } for  pid=548 comm="bgcompact" path="/data/knox/data/100/EN.FXaXll7racCXkUadyRjuiJ4E7--z.m7efRXSeBXWuCQXl8wjDpMkR6Zs9VDJwkrAUtC8gMuF5gwRy3o-/EN.FWaXll7racCXkUadyRjuiJ4E7--z.m7efRXSb7S3uDqIITT4nLbIDNxlwk--/EN.FWaXll7racCXkUadyRjuiJ4E7--z.m7efRXS65v1GcgvbpzwqAN2.gc7P---/EN.FWaXll7racCXkUadyRjuiJ4E7--z.m7efRXSyhH4sV9nQk3A0odzu.TY----/EN.FWaXll7racCXkUadyRjuiJ4E7--z.m7efRXSOFWJNRdmjYACIlWno41KNU--/EN.FXaXll7racCXkUadyRjuiJ4E7--z.m7efRXSP.NsB.HDypcGwPZNUqdz4PnsHvlqecHVMj1hyCkGivk-" dev="dm-1" ino=655792 scontext=u:r:sswap:s0 tcontext=u:r:untrusted_app:s0:c612,c768 tclass=fd permissive=0 SEPF_SECMOBILE_6.0.1_0002
-# avc:  denied  { read } for  pid=4096 comm="Binder_1" path=2F73746F726167652F433146372D313530312F32472F4F74686572732F4F74686572732F46756C6C204D5033202D2031472F46756C6C204D503320312028323036292E6D7033 dev="sdcardfs" ino=180 scontext=u:r:system_server:s0 tcontext=u:object_r:vfat:s0 tclass=file permissive=0 SEPF_SECMOBILE_6.0.1_0002
-# avc:  denied  { ioctl } for  pid=5166 comm="NodeServiceThre" path="/sys/kernel/debug/tracing/trace_marker" dev="debugfs" ino=4082 ioctlcmd=5451 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:debugfs:s0 tclass=file permissive=0 SEPF_SECMOBILE_6.0.1_0002
-# avc:  denied  { ioctl } for  pid=4726 comm="NodeServiceThre" path="socket:[32899]" dev="sockfs" ino=32899 ioctlcmd=5451 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:surfaceflinger:s0 tclass=unix_stream_socket permissive=0 SEPF_SECMOBILE_6.0.1_0002
-# avc:  denied  { setattr } for  pid=3159 comm="argosd" name="target_loads" dev="sysfs" ino=24314 scontext=u:r:argosd:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-G930S_6.0_0002
-# avc:  denied  { setattr } for  pid=1174 comm="fingerprintd" name="target_loads" dev="sysfs" ino=23095 scontext=u:r:fingerprintd:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-G930S_6.0_0002
-# P160113-00682 had kernel sys_ptrace 168 counts
-# avc:  denied  { sys_ptrace } for  pid=0 comm="swapper/0" capability=19  scontext=u:r:kernel:s0 tcontext=u:r:kernel:s0 tclass=capability permissive=0
-# P160119-00384 had audit(1453148856.474:2004): arch=40000028 syscall=283 per=8 success=no exit=-13 a0=19 a1=fff58f5c a2=1d a3=f6e7e050 items=0 ppid=3215 ppcomm=main pid=29870 auid=4294967295 uid=10010279 gid=10010279 euid=10010279 suid=10010279 fsuid=10010279 egid=10010279 sgid=10010279 fsgid=10010279 ses=4294967295 tty=(none) comm="anmaster.mguard" exe="/system/bin/app_process32" subj=u:r:untrusted_app:s0:c612,c768 key=(null)
-# audit(1453148856.474:2004): proctitle="" denial, "untrusted_app self:unix_stream_socket connectto", 287 counts at each avc_msg
-# package com.cleanmaster.mguard, avc:  denied  { connectto } for  pid=29870 comm="anmaster.mguard" path=005F494A494E5348414E5F434C45414E4D41535445525F4950435F scontext=u:r:untrusted_app:s0:c612,c768 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=unix_stream_socket permissive=0
-# avc:  denied  { search } for  pid=25549 comm="ng.android.spay" name="22798" dev="proc" ino=7581982 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:r:sec_untrusted_app:s0:c612,c768 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0002
-# P160120-00037 avc:  denied  { ioctl } for  pid=4344 comm=474C5468726561642032303835 path="socket:[641234]" dev="sockfs" ino=641234 ioctlcmd=8927 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=tcp_socket permissive=0
-# arch=40000028 syscall=54 per=8 success=no exit=-13 a0=3b a1=8927 a2=d8fdec20 a3=ded04740 items=0 ppid=3184 ppcomm=main pid=4344 auid=4294967295 uid=10203 gid=10203 euid=10203 suid=10203 fsuid=10203 egid=10203 sgid=10203 fsgid=10203 ses=4294967295 tty=(none) comm=474C5468726561642032303835 exe="/system/bin/app_process32" subj=u:r:untrusted_app:s0:c512,c768 key=(null)
-# proctitle="com.verizonmedia.go90.enterprise"
-# avc:  denied  { call } for  pid=32576 comm="atrace" scontext=u:r:shell:s0 tcontext=u:r:dmb:s0 tclass=binder permissive=0 SEPF_SECMOBILE_6.0.1_0004
-# avc:  denied  { remount } for  pid=26180 comm="mount" scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:labeledfs:s0 tclass=filesystem permissive=0 SEPF_SECMOBILE_6.0.1_0003
-# avc:  denied  { search } for  pid=11617 comm="t.event.handler" name="com.samsung.aasaservice" dev="dm-0" ino=188 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:aasa_app_data_file:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0005
-# avc:  denied  { 0x800000 } for  pid=3946 comm=4F70656E2064617461626173652069 name="databases" dev="ecryptfs" ino=589595 scontext=u:r:untrusted_app:s0:c612,c768 tcontext=u:object_r:unlabeled:s0 tclass=file permissive=0 SEPF_SECMOBILE_6.0.1_0004
-# avc:  denied  { search } for  pid=7021 comm="ng.android.spay" name="6542" dev="proc" ino=1259018 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:r:system_app:s0:c612 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0003
-# avc:  denied  { read } for  pid=2764 comm="pool-2-thread-4" name="minfree" dev="sysfs" ino=6949 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_lowmemorykiller:s0 tclass=file permissive=0 com.cleanmaster.mguard:service
-# avc:  denied  { search } for  pid=23475 comm="ung.aasaservice" name="com.samsung.aasaservice" dev="dm-0" ino=457107 scontext=u:r:sysaccess_platform_app:s0:c523,c768 tcontext=u:object_r:aasa_app_data_file:s0:c512,c768 tclass=dir
-# avc:  denied  { setattr } for  pid=2113 comm="chmod" name="tmp" dev="mmcblk0p32" ino=327682 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:shell_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0008
-# avc:  denied  { search } for  pid=10793 comm="control.samsung" name="com.android.settings" dev="mmcblk0p21" ino=458860 scontext=u:r:mrst_plugin_app:s0:c512,c768 tcontext=u:object_r:system_app_data_file:s0 tclass=dir
-# avc:  denied  { getattr } for  pid=29611 comm="id.app.sysscope" path="/data/data/com.sec.android.app.sysscope/databases/SysScope.db" dev="dm-0" ino=459146 scontext=u:r:system_app:s0:c524 tcontext=u:object_r:system_app_data_file:s0:c522 tclass=file permissive=0 SEPF_SECMOBILE_6.0.1_0010 proctitle="com.sec.android.app.sysscope"
-# avc:  denied  { write } for  pid=1 comm="init" name="/" dev="proc" ino=1 scontext=u:r:init:s0 tcontext=u:object_r:proc:s0 tclass=dir SEPF_SECMOBILE_6.0.1_0010 
-# avc:  denied  { read } for  pid=24378 comm="u.go.launcherex" name="window_type" dev="sysfs" ino=34519 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:sysfs_lcd_writable:s0 tclass=file permissive=0 SEPF_SECMOBILE_6.0.1_0011
-# avc:  denied  { read } for  pid=703 comm="sgdisk" path="/firmware/image/tz_iccc.mdt" dev="sda16" ino=27 scontext=u:r:sgdisk:s0 tcontext=u:object_r:firmware_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_6.0.1_0011
-# avc:  denied  { read } for  pid=2424 comm="sgdisk" path=2F7072656C6F61642F494E5445524E414C5F5344434152442F53616D73756E672F4D757369632F4F7665722074686520486F72697A6F6E2E6D7033 dev="mmcblk0p22" ino=16 scontext=u:r:sgdisk:s0 tcontext=u:object_r:hidden_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_6.0.1_0011
-# avc:  denied  { search } for  pid=10573 comm="m.spotify.music" name="150" dev="dm-1" ino=1048626 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:container_app_data_backend:s0:c662,c768 tclass=dir permissive=0
-# avc:  denied  { syslog_read } for  pid=13256 comm="dmesg" scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:r:kernel:s0 tclass=system permissive=0 SEPF_SECMOBILE_6.0.1_0013
-# avc:  denied  { write } for  pid=10603 comm="wvkprov" name="app" dev="sda18" ino=196610 scontext=u:r:system_app:s0 tcontext=u:object_r:apk_data_file:s0 tclass=dir permissive=0
-# avc:  denied  { read write } for  pid=2347 comm="vdc" path="socket:[1501]" dev="sockfs" ino=1501 scontext=u:r:vdc:s0 tcontext=u:r:vold:s0 tclass=netlink_socket permissive=0
-# avc:  denied  { search } for  pid=4297 comm="Binder_2" name="13381" dev="proc" ino=557781 scontext=u:r:nfc:s0 tcontext=u:r:platform_app:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0013
-# avc:  denied  { getattr } for  pid=28898 comm="ps" path="/proc/9044" dev="proc" ino=83551 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:r:untrusted_app:s0:c662,c768 tclass=dir permissive=0
-# avc:  denied  { search } for  pid=28898 comm="ps" name="9044" dev="proc" ino=83551 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:r:untrusted_app:s0:c662,c768 tclass=dir permissive=0
-# avc:  denied  { getattr } for  pid=9181 comm="ps" path="/proc/20913" dev="proc" ino=170554 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:r:filtered_untrusted_app:s0:c662,c768 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0013
-# avc:  denied  { search } for  pid=2850 comm="Binder_1" name="8068" dev="proc" ino=1096742 scontext=u:r:nfc:s0 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0013
-# avc:  denied  { setattr } for  pid=25637 comm="pool-3-thread-7" name="data" dev="dm-1" ino=65537 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:system_data_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0013
-# avc:  denied  { use } for  pid=7643 comm="dnsmasq" path="socket:[665649]" dev="sockfs" ino=665649 scontext=u:r:dnsmasq:s0 tcontext=u:r:untrusted_app:s0:c512,c768 tclass=fd permissive=0 
-# avc:  denied  { search } for  pid=3719 comm="Binder_2" name="7407" dev="proc" ino=126722 scontext=u:r:nfc:s0 tcontext=u:r:sec_untrusted_app:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_6.0.1_0013
+# P170707-03498
+# avc:  denied  { getattr } for  pid=25574 comm="android.bankabc" path="/data/misc/profiles/cur/0/foreign-dex/@system@app@WebViewGoogle@WebViewGoogle.apk" dev="dm-1" ino=1704462 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:user_profile_foreign_dex_data_file:s0:c512,c768 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# avc:  denied  { search } for  pid=7140 comm="er:bdservice_v1" name="com.baidu.BaiduMap" dev="dm-1" ino=1180187 scontext=u:r:system_app:s0 tcontext=u:object_r:app_data_file:s0:c512,c768 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app user_profile_foreign_dex_data_file:file getattr;
+auditfilter system_app app_data_file:dir search; comm="er:bdservice_v1" name="com.baidu.BaiduMap"
 
+# P170701-00755, P170705-00092
+# avc:  denied  { read } for  pid=22008 comm="insthk" name="sfs" dev="sda6" ino=25 scontext=u:r:system_app:s0 tcontext=u:object_r:efs_file:s0 tclass=dir permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter system_app efs_file:dir read; comm="insthk"
+
+# P170714-00576
+# avc:  denied  { read } for  pid=8244 comm="Thread-7" name="authorize.xml" dev="dm-0" ino=382 scontext=u:r:untrusted_app:s0:c512,c768 tcontext=u:object_r:security_system_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter untrusted_app security_system_file:file read;
+
+# P170714-00557
+# avc:  denied  { getattr } for  pid=4086 comm="pool-1-thread-1" path="/dev/__properties__/u:object_r:device_logging_prop:s0" dev="tmpfs" ino=11769 scontext=u:r:trustonicpartner_app:s0:c512,c768 tcontext=u:object_r:device_logging_prop:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# avc:  denied  { getattr } for  pid=4086 comm="pool-1-thread-1" path="/dev/__properties__/u:object_r:logpersistd_logging_prop:s0" dev="tmpfs" ino=11768 scontext=u:r:trustonicpartner_app:s0:c512,c768 tcontext=u:object_r:logpersistd_logging_prop:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# avc:  denied  { getattr } for  pid=4086 comm="pool-1-thread-1" path="/dev/__properties__/u:object_r:mmc_prop:s0" dev="tmpfs" ino=11767 scontext=u:r:trustonicpartner_app:s0:c512,c768 tcontext=u:object_r:mmc_prop:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# avc:  denied  { getattr } for  pid=4086 comm="pool-1-thread-1" path="/dev/__properties__/u:object_r:safemode_prop:s0" dev="tmpfs" ino=11766 scontext=u:r:trustonicpartner_app:s0:c512,c768 tcontext=u:object_r:safemode_prop:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# avc:  denied  { getattr } for  pid=4086 comm="pool-1-thread-1" path="/dev/__properties__/u:object_r:recovery_prop:s0" dev="tmpfs" ino=11755 scontext=u:r:trustonicpartner_app:s0:c512,c768 tcontext=u:object_r:recovery_prop:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter trustonicpartner_app device_logging_prop:file getattr;
+auditfilter trustonicpartner_app logpersistd_logging_prop:file getattr;
+auditfilter trustonicpartner_app mmc_prop:file getattr;
+auditfilter trustonicpartner_app safemode_prop:file getattr;
+auditfilter trustonicpartner_app recovery_prop:file getattr;
+
+# P170714-05427 
+# avc:  denied  { create } for  pid=11475 comm="Chrome_libJingl" scontext=u:r:isolated_app:s0:c512,c768 tcontext=u:r:isolated_app:s0:c512,c768 tclass=udp_socket permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter isolated_app isolated_app:udp_socket create;
+
+# P170720-00250
+# http://mobilerndhub.sec.samsung.net/hub/site/seandroid/board/N_review_request/view/22192704
+# avc:  denied  { read } for  pid=10904 comm="clatd" path="/proc/3155/cmdline" dev="proc" ino=196525 scontext=u:r:clatd:s0 tcontext=u:r:platform_app:s0:c512,c768 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# Requester : ansik.shin
+auditfilter clatd platform_app:file read; comm="clatd"
+
+# P170720-03498
+# avc:  denied  { read write } for  pid=22352 comm="clatd" path="socket:[5128116]" dev="sockfs" ino=5128116 scontext=u:r:clatd:s0 tcontext=u:r:system_server:s0 tclass=udp_socket permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# P170720-03465
+#  avc:  denied  { read write } for  pid=23029 comm="clatd" path="socket:[4127978]" dev="sockfs" ino=4127978 scontext=u:r:clatd:s0 tcontext=u:r:system_server:s0 tclass=udp_socket permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+# Requester : ansik.shin
+auditfilter clatd system_server:udp_socket { read write }; comm="clatd"
+
+# P170726-06137, P170726-06093
+avc:  denied  { write } for  pid=16037 comm="com.policydm" name="system@priv-app@SPDClient@SPDClient.apk@classes.dex" dev="dm-1" ino=738 scontext=u:r:policyloader_app:s0 tcontext=u:object_r:dalvikcache_data_file:s0 tclass=file permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter policyloader_app dalvikcache_data_file:file write; comm="com.policydm"
+
+# http://mobilerndhub.sec.samsung.net/hub/site/seandroid/board/N_review_request/view/22232201
+# avc: denied { call } for pid=1221 comm="Binder:780_1" scontext=u:r:audioserver:s0 tcontext=u:r:audiod:s0 tclass=binder permissive=0 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter audioserver audiod:binder call;
