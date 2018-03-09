@@ -152,6 +152,8 @@ auditfilter system_server zygote_exec:file execute; comm="am"
 # avc:  denied  { read } for  pid=12343 comm="Binder:4430_5" path="/storage/emulated/0/wiz/bell/사계겨울2악장-비발디_후렴.mp3" dev="fuse" ino=2899 scontext=u:r:system_server:s0 tcontext=u:object_r:fuse:s0 tclass=file permissive=0
 auditfilter system_server fuse:file read;
 
+# P170901-01945 Nobody analysis about system_server read operation to sdcard. so we filter it.
+auditfilter system_server vfat:dir { read open };
 
 ### toolbox ###
 # service umount_cpdump /system/bin/umount /cpdump
@@ -202,6 +204,13 @@ auditfilter perfd perfd:capability sys_ptrace;
 # P160921-01434 : denial from UEventObserver
 # avc:  denied  { net_admin } for  pid=7898 comm="UEventObserver" capability=12  scontext=u:r:system_app:s0 tcontext=u:r:system_app:s0 tclass=capability permissive=0
 auditfilter system_app system_app:capability net_admin;
+
+# P170828-01334, http://mobilerndhub.sec.samsung.net/hub/site/seandroid/board/N_review_request/view/22342126/?page=1
+# requester : dung.tt5@samsung.com
+# avc: denied { call } for pid=20518 comm=4173796E635461736B202336 scontext=u:r:system_app:s0 tcontext=u:r:netd:s0 tclass=binder permissive=1 SEPF_SECMOBILE_7.1.1_0001 unfiltered
+auditfilter system_app netd:binder call; comm=4173796E635461736B202336
+# avc: denied { find } for service=netd pid=17004 uid=1000 scontext=u:r:system_app:s0 tcontext=u:object_r:netd_service:s0 tclass=service_manager permissive=1
+auditfilter system_app netd_service:service_manager find;
 
 ### platform_app ###
 
